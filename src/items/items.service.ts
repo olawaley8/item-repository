@@ -12,22 +12,49 @@ export class ItemsService {
     ){}
 
     findAll(): Promise<Item[]> {
-        return this.itemsRepository.find();
+        try{
+            return this.itemsRepository.find();
+        }
+        catch(err){
+            throw err;
+        }
     }
 
     async findOne(id: string): Promise<Item>{
-        return await this.itemsRepository.findOne(id)
+        try{
+
+            const item = await this.itemsRepository.findOne(id)
+            if(!item){
+                throw new NotFoundException('item not found')
+            }
+            return item;
+        }
+        catch(err){
+            throw err;
+        }
     }
 
     async createItem(createItemDto: createItemDto): Promise<Item> {
-        const newItem= this.itemsRepository.create(createItemDto);
-
-        return await this.itemsRepository.save(newItem)
+        try{
+            const newItem= this.itemsRepository.create(createItemDto);
+            return await this.itemsRepository.save(newItem)
+        }
+        catch(err){
+            throw err;
+        }
   
     }
 
     async deleteItem(id: string): Promise<void> {
-        await this.itemsRepository.delete(id)
+       try{
+        const result= await this.itemsRepository.delete(id)
+        if(result.affected === 0){
+            throw new NotFoundException(`The item with id '${id}' does not exist`)
+        }
+       } 
+       catch (err){
+           throw err;
+       }
         
     }
 
